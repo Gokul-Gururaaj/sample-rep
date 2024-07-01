@@ -19,6 +19,5 @@ substitutions:
  
 # Optional timeout setting
 timeout: '1200s'  # 20 minutes
-Google Cloud Platform
-Google Cloud Platform lets you build, deploy, and scale applications, websites, and services on the same infrastructure as Google.
+
  
