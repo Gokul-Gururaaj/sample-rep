@@ -1,0 +1,24 @@
+
+steps:
+  # Step to check if the bucket exists
+  - name: 'gcr.io/cloud-builders/gcloud'
+    entrypoint: 'sh'
+    args:
+      - '-c'
+      - |
+        if ! gsutil ls -b gs://$BUCKET_NAME; then
+          gsutil mb gs://$BUCKET_NAME
+        fi
+ 
+
+ 
+# Substitutions for the bucket name and file list path
+substitutions:
+  _BUCKET_NAME: 'bucket123498'
+
+ 
+# Optional timeout setting
+timeout: '1200s'  # 20 minutes
+Google Cloud Platform
+Google Cloud Platform lets you build, deploy, and scale applications, websites, and services on the same infrastructure as Google.
+ 
