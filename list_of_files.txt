@@ -1,1 +1,3 @@
 cloudbuild.yaml
+csv/employee_salary_mock (2).csv
+csv/flights.csv
