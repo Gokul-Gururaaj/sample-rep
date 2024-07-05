@@ -1,4 +1,4 @@
 cloudbuild.yaml
-csv/*
+csv/
 non_existing_file.csv
 
