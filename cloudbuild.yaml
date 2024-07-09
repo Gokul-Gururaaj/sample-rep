@@ -1,23 +1,58 @@
-
 steps:
-  # Step to check if the bucket exists
-  - name: 'gcr.io/cloud-builders/gcloud'
-    entrypoint: 'sh'
+  - name: gcr.io/cloud-builders/gcloud
+    args:
+      - '-c'
+      - 'echo "Hello, World!"'
+    entrypoint: bash
+  - name: gcr.io/cloud-builders/gsutil
     args:
       - '-c'
       - |
-        if ! gsutil ls -b gs://$BUCKET_NAME; then
-          gsutil mb gs://$BUCKET_NAME
+        if gsutil ls -b gs://$_BUCKET_NAME; then
+           echo "Bucket gs://$_BUCKET_NAME already exists."
+        else
+          echo "Bucket gs://YOUR_BUCKET_NAME does not exist. Creating..."
+          gsutil mb -l us-central1 gs://$_BUCKET_NAME
         fi
- 
-
- 
-# Substitutions for the bucket name and file list path
-substitutions:
-  _BUCKET_NAME: 'bucket123498'
-
- 
-# Optional timeout setting
-timeout: '1200s'  # 20 minutes
-
- 
+    entrypoint: bash
+  - name: gcr.io/cloud-builders/git
+    args:
+      - clone
+      - $_REPO_LINK
+      - repo
+  - name: gcr.io/cloud-builders/gcloud
+    args:
+      - '-c'
+      - |
+        while IFS= read -r line; do
+        path="repo/$line"
+        folder=$(dirname "$path")
+        filename=$(basename "$path")
+        echo "FolderPath $folder"
+        echo "Filename $filename"
+        if [ -d "$folder" ]; then
+        echo "$folder exists."
+        if [ "$(ls $path)" ]; then
+        ls $path
+        echo "Files exist in $folder"
+        else
+        echo "No files found in $folder"
+        exit 1
+        fi
+        else
+        echo "$folder does not exist."
+        exit 1
+        fi
+        done < repo/$_CONTROL_FILE
+    entrypoint: bash
+  - name: gcr.io/cloud-builders/gcloud
+    args:
+      - '-c'
+      - |
+        while IFS= read -r file; do
+          echo "Copying file: $file"
+          gsutil cp "repo/$file" gs://$_BUCKET_NAME
+        done < repo/$_CONTROL_FILE
+    entrypoint: bash
+options:
+  logging: CLOUD_LOGGING_ONLY
